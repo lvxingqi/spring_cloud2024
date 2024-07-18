@@ -1,0 +1,32 @@
+server:
+  port: 9527
+spring:
+  application:
+    name: cloud-gateway
+  cloud:
+    consul:
+      discovery:
+        prefer-ip-address: true
+        service-name: ${spring.application.name}
+    gateway:
+      routes:
+        - id: pay_route1
+#          uri: http://localhost:8001
+          uri: lb://cloud-payment-service
+          predicates:
+            - Path=/pay/gateway/get/**
+            - My=diamond
+        - id: pay_route2
+          uri: lb://cloud-payment-service
+          predicates:
+            - Path=/pay/gateway/info/**
+
+
+        - id: pay_route3
+          uri: lb://cloud-payment-service
+          predicates:
+            - Path=/pay/gateway/filter/**
+          filters:
+            - AddRequestHeader=x-Request-atguigu1,atguiguValue1
+            - AddRequestHeader=x-Request-atguigu2,atguiguValue2
+            - My=atguigu

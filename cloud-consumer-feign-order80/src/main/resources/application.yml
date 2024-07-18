@@ -1,0 +1,53 @@
+server:
+  port: 80
+spring:
+  application:
+    name: cloud-consumer-openfeign-order
+  config: #注意，在不使用bootstrap优先加载外部配置时，需要显式配置spring.config.import=optional:consul:,
+          #否则项目会启动失败
+    import: 'optional:consul:'
+  cloud:
+    openfeign:
+      client:
+        config:
+#          default:
+#            connectTimeout: 3000
+#            readTimeout: 3000
+          cloud-payment-service:
+            connectTimeout: 2000
+            readTimeout: 2000
+      httpclient:
+        hc5:
+          enabled: true
+      compression:
+        request:
+          enabled: true
+          mime-types: text/xml,application/xml,application/json
+          min-request-size: 2048
+        response:
+          enabled: true
+    consul:
+      host: localhost
+      port: 8500
+      discovery:
+        service-name: ${spring.application.name}
+        prefer-ip-address: true
+      config:
+        format: yaml
+        profile-separator: "-"
+        watch:
+          wait-time: 1
+logging:
+  level:
+    com:
+      atguigu:
+        cloud:
+          apis:
+            PayFeignApi: DEBUG
+management:
+  zipkin:
+    tracing:
+      endpoint: http://localhost:9411/api/v2/spans
+  tracing:
+    sampling:
+      probability: 1.0
